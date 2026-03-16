@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import SearchBar from './components/Search-bar'
 import BookList from './components/Book-list'
+import Modal from './components/Modal'
 import './index.css'
 
 function App() {
@@ -29,10 +30,36 @@ function App() {
     setLoading(false)
   }
 
+  const [selectedBook, setSelectedBook] = useState(null)
+const [bookDetails, setBookDetails] = useState(null)
+
   //DELETE A BOOK
   function deleteBook(id) {
     setBooks(books.filter(book => book.id !== id))
   }
+
+  // open book details function
+  async function openBook(book) {
+  setSelectedBook(book)
+  setBookDetails(null)
+
+  const workId = book.id.replace('/works/', '')
+  const response = await fetch(`https://openlibrary.org/works/${workId}.json`)
+  const data = await response.json()
+
+  const description = data.description
+    ? typeof data.description === 'string'
+      ? data.description
+      : data.description.value
+    : 'No description available.'
+
+  setBookDetails({ description })
+}
+
+function closeBook() {
+  setSelectedBook(null)
+  setBookDetails(null)
+}
 
   
   return (
@@ -41,7 +68,15 @@ function App() {
       <p className="subtitle">Search any book in the world</p>
       <SearchBar onSearch={searchBooks} />
       {loading && <p className="loading">Searching...</p>}
-      <BookList books={books} onDelete={deleteBook} />
+      <BookList books={books} onDelete={deleteBook} onOpen={openBook} />
+      {selectedBook && (
+        <Modal 
+        book={selectedBook}
+        details={bookDetails}
+        onClose={closeBook}
+        />
+      )}
+
     </div>
   )
 }

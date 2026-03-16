@@ -1,7 +1,6 @@
 import BookCard from './Book-card'
 
-function BookList({ books, onDelete }) {
-
+function BookList({ books, onDelete, onOpen }) {
   if (books.length === 0) {
     return (
       <div className="empty-state">
@@ -17,6 +16,7 @@ function BookList({ books, onDelete }) {
           key={book.id}
           book={book}
           onDelete={onDelete}
+          onOpen={onOpen}
         />
       ))}
     </div>
